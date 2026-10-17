@@ -1,7 +1,7 @@
 {
   "name": "Studio HTML",
   "short_name": "Studio HTML",
-  "description": "Studio HTML aplikasi web yang dapat diinstal di Android dan desktop.",
+  "description": "Studio HTML - aplikasi web yang dapat diinstal di Android dan desktop",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
