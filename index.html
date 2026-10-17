@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
-<link rel="manifest" id="mf">
+<link rel="manifest" href="/manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -2552,7 +2552,15 @@ vp('100%');
    PWA — manifest inline + SW best-effort
    ============================================================ */
 (function setupPWA(){
-  const iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#4f46e5"/><text x="50%" y="54%" font-family="ui-monospace,monospace" font-size="180" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="middle"></></text></svg>';
+  const iconSvg =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">' +
+    '<rect width="512" height="512" rx="112" fill="#4f46e5"/>' +
+    '<text x="50%" y="50%" dy=".35em" ' +
+      'font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" ' +
+      'font-size="180" font-weight="700" fill="#fff" text-anchor="middle">' +
+      '&lt;/&gt;' +
+    '</text>' +
+  '</svg>';
   const iconUrl = 'data:image/svg+xml,' + encodeURIComponent(iconSvg);
   const buildMf = () => {
     const t = THEMES.find(x => x[0] === cfg.theme) || THEMES[0];
@@ -2584,7 +2592,7 @@ vp('100%');
   };
 
   if('serviceWorker' in navigator && location.protocol !== 'file:'){
-    navigator.serviceWorker.register('sw.js').catch(() => {
+    navigator.serviceWorker.register('serviceworker.js').catch(() => {
       try{
         const code = "self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));";
         const url = URL.createObjectURL(new Blob([code], {type:'text/javascript'}));

@@ -1,5 +1,5 @@
 // Studio HTML - Service Worker
-const CACHE_NAME = 'studio-html-v2';
+const CACHE_NAME = 'studio-html-v1';
 const ASSETS = [
   '/',
   '/index.html',
