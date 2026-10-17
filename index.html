@@ -8,6 +8,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<link rel="manifest" id="mf">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Studio HTML">
 <style>
 :root{--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);--sh1:0 1px 2px rgba(16,24,40,.06);--sh2:0 10px 30px rgba(16,24,40,.10);--sh3:0 24px 60px rgba(16,24,40,.22)}
 [data-theme=terang]{--bg:#f4f6fb;--sf:#fff;--sub:#eceff7;--ink:#111827;--mut:#667085;--ln:#e3e7f0;--acc:#4f46e5;--on:#fff;--soft:#eef0ff}
@@ -208,23 +213,6 @@ input[type=range]:focus{box-shadow:none}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
-<!-- TWA-GENERATOR:START (auto-generated, jangan edit manual) -->
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    <!-- Theme & status bar -->
-    <meta name="theme-color" content="#0a0a0f">
-    <meta name="color-scheme" content="light dark">
-    <!-- Android / Chrome -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Studio HTML">
-    <!-- iOS Safari -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Studio HTML">
-    <link rel="apple-touch-icon" href="/icon-192.png">
-    <!-- Favicon fallback -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<!-- TWA-GENERATOR:END -->
 </head>
 <body>
 <div class="app" id="app">
@@ -359,42 +347,7 @@ const ic = (n, z = 20) => `<svg width="${z}" height="${z}" viewBox="0 0 24 24" f
 /* ============================================================
    CONSTANTS
    ============================================================ */
-const BLANK = '<!DOCTYPE html>\n<html lang="id">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Tanpa judul</title>\n</head>\n<body>\n\n<!-- TWA-GENERATOR:START (auto-generated, jangan edit manual) -->
-    <script>
-      // Theme color runtime (auto switch light/dark)
-      (function(){
-      var meta = document.querySelector('meta[name="theme-color"]');
-      var light = '#f5f5f9';
-      var dark = '#0a0a0f';
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.name = 'theme-color';
-        document.head.appendChild(meta);
-      }
-      function applyThemeColor(isDark){
-        meta.setAttribute('content', isDark ? dark : light);
-      }
-      var mq = window.matchMedia('(prefers-color-scheme: dark)');
-      applyThemeColor(mq.matches);
-      if (mq.addEventListener) {
-        mq.addEventListener('change', function(e){ applyThemeColor(e.matches); });
-      } else if (mq.addListener) {
-        mq.addListener(function(e){ applyThemeColor(e.matches); });
-      }
-    })();
-    </script>
-    <script>
-      // Service worker registration
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/serviceworker.js')
-            .then(function (reg) { console.log('[TWA] Service Worker registered. Scope:', reg.scope); })
-            .catch(function (err) { console.error('[TWA] Service Worker failed:', err); });
-        });
-      }
-    </script>
-<!-- TWA-GENERATOR:END -->
-</body>\n</html>';
+const BLANK = '<!DOCTYPE html>\n<html lang="id">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Tanpa judul</title>\n</head>\n<body>\n\n</body>\n</html>';
 
 const TEMPLATES = [
   {
@@ -2436,6 +2389,7 @@ function applyCfg(){
   if(f) f.style.background = cfg.pbg;
   if(fw) fw.style.background = cfg.pbg;
   try{ localStorage.setItem('hs-cfg', JSON.stringify(cfg)); }catch(e){}
+  if(window._setMf) window._setMf();
 }
 
 /* ============================================================
@@ -2593,6 +2547,52 @@ $('#fx').onclick = () => $('#app').classList.remove('focus');
 applyCfg();
 mark();
 vp('100%');
+
+/* ============================================================
+   PWA — manifest inline + SW best-effort
+   ============================================================ */
+(function setupPWA(){
+  const iconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#4f46e5"/><text x="50%" y="54%" font-family="ui-monospace,monospace" font-size="180" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="middle"></></text></svg>';
+  const iconUrl = 'data:image/svg+xml,' + encodeURIComponent(iconSvg);
+  const buildMf = () => {
+    const t = THEMES.find(x => x[0] === cfg.theme) || THEMES[0];
+    return {
+      name: 'Studio HTML',
+      short_name: 'Studio',
+      description: 'Editor HTML single-file dengan pratinjau langsung',
+      start_url: location.href.split('#')[0],
+      display: 'standalone',
+      orientation: 'any',
+      background_color: t[2],
+      theme_color: t[3],
+      lang: 'id',
+      icons: [
+        {src: iconUrl, sizes: 'any', type: 'image/svg+xml', purpose: 'any'},
+        {src: iconUrl, sizes: 'any', type: 'image/svg+xml', purpose: 'maskable'}
+      ]
+    };
+  };
+  window._setMf = () => {
+    const el = document.getElementById('mf');
+    if(!el) return;
+    try{
+      const b = new Blob([JSON.stringify(buildMf())], {type:'application/manifest+json'});
+      const prev = el.getAttribute('href');
+      el.setAttribute('href', URL.createObjectURL(b));
+      if(prev && prev.startsWith('blob:')) setTimeout(() => URL.revokeObjectURL(prev), 2000);
+    }catch(e){}
+  };
+
+  if('serviceWorker' in navigator && location.protocol !== 'file:'){
+    navigator.serviceWorker.register('sw.js').catch(() => {
+      try{
+        const code = "self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));";
+        const url = URL.createObjectURL(new Blob([code], {type:'text/javascript'}));
+        navigator.serviceWorker.register(url).catch(() => {});
+      }catch(e){}
+    });
+  }
+})();
 
 (async function boot(){
   const shared = await readHash();
